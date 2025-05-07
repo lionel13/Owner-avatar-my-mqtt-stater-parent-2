@@ -1,0 +1,17 @@
+mqtt:
+  host: tcp://localhost:1883
+  client-id: my-spring-client
+  username: user
+  password: pass
+  qos: 1
+  publisher:
+    async: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
