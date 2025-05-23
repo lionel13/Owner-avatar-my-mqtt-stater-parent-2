@@ -105,7 +105,7 @@ class SyncMqttPublisherServiceTest {
         when(mockClient.isConnected()).thenReturn(true);
 
         Object badPayload = new Object() {
-            public Object self = this; // cause circular reference
+            public final Object self = this; // cause circular reference
         };
 
         MqttPublishException ex = assertThrows(MqttPublishException.class, () ->

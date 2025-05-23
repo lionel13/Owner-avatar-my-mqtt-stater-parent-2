@@ -24,7 +24,7 @@ public class MqttAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MqttAsyncClient mqttClient(MqttProperties props) throws MqttException {
+    public MqttAsyncClient mqttClient(final MqttProperties props) throws MqttException {
         MqttAsyncClient client = new MqttAsyncClient(props.getHost(), props.getClientId());
 
         MqttConnectionOptions options = new MqttConnectionOptions();
@@ -39,14 +39,14 @@ public class MqttAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "mqtt.publisher.async", havingValue = "true")
-    public PublisherStrategy asyncPublisher(MqttAsyncClient client, ObjectMapper mapper) {
-        return new AsyncMqttPublisherService(client, 1, mapper);
+    public <T> PublisherStrategy<T> asyncPublisher(final MqttAsyncClient client, final MqttProperties props, final ObjectMapper mapper) {
+        return new AsyncMqttPublisherService<>(client, props.getQos(), mapper);
     }
 
     @Bean
     @ConditionalOnProperty(name = "mqtt.publisher.async", havingValue = "false", matchIfMissing = true)
-    public PublisherStrategy syncPublisher(MqttAsyncClient client, ObjectMapper mapper) {
-        return new SyncMqttPublisherService(client, 1, mapper);
+    public <T> PublisherStrategy<T> syncPublisher(MqttAsyncClient client, final MqttProperties props, ObjectMapper mapper) {
+        return new SyncMqttPublisherService<>(client, props.getQos(), mapper);
     }
 
     @Bean

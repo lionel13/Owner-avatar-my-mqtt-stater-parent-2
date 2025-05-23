@@ -8,14 +8,14 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AsyncMqttPublisherService extends AbstractMqttPublisherService {
+public class AsyncMqttPublisherService<T> extends AbstractMqttPublisherService<T> {
 
     public AsyncMqttPublisherService(MqttAsyncClient client, int qos, ObjectMapper objectMapper) {
         super(client, qos, objectMapper);
     }
 
     @Override
-    protected void doPublish(String topic, MqttMessage message) throws MqttException {
+    protected void doPublish(final String topic, final MqttMessage message) throws MqttException {
         client.publish(topic, message, null, myMqttActionListenerForTopic(topic));
     }
 }

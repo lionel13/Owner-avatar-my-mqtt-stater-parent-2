@@ -11,21 +11,21 @@ public class MyMqttActionListener implements MqttActionListener {
 
     private final String topic;
 
-    public static MyMqttActionListener myMqttActionListenerForTopic(String topic) {
+    public static MyMqttActionListener myMqttActionListenerForTopic(final String topic) {
         return new MyMqttActionListener(topic);
     }
 
-    private MyMqttActionListener(String topic) {
+    private MyMqttActionListener(final String topic) {
         this.topic = topic;
     }
 
     @Override
-    public void onSuccess(IMqttToken asyncActionToken) {
+    public void onSuccess(final IMqttToken asyncActionToken) {
         logger.debug(() -> "Published to topic [" + topic + "] successfully.");
     }
 
     @Override
-    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+    public void onFailure(final IMqttToken asyncActionToken, final Throwable exception) {
         logger.error(exception, () -> "Failed to publish message to topic [" + topic + "]");
     }
 }

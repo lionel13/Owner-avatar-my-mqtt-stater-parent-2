@@ -8,7 +8,7 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class SyncMqttPublisherService extends AbstractMqttPublisherService {
+public class SyncMqttPublisherService<T> extends AbstractMqttPublisherService<T> {
 
     public SyncMqttPublisherService(MqttAsyncClient client, int qos, ObjectMapper objectMapper) {
         super(client, qos, objectMapper);

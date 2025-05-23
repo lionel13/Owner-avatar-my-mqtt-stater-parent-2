@@ -1,6 +1,7 @@
 package fr.varex13.mqtt.publisher;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
@@ -11,12 +12,12 @@ import org.springframework.core.log.LogAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class AbstractMqttPublisherService implements PublisherStrategy {
+public abstract class AbstractMqttPublisherService<T> implements PublisherStrategy<T> {
 
     protected final LogAccessor logger = new LogAccessor(LogFactory.getLog(getClass()));
 
     protected final MqttAsyncClient client;
-    protected final int qos;
+    private final int qos;
     protected final ObjectMapper objectMapper;
 
     protected AbstractMqttPublisherService(final MqttAsyncClient client,
@@ -28,37 +29,44 @@ public abstract class AbstractMqttPublisherService implements PublisherStrategy 
     }
 
     @Override
-    public <T> void publish(final String topic, final T payload) {
+    public void publish(final String topic, final T payload) {
+        publish(topic, qos, payload);
+    }
+
+    @Override
+    public void publish(final String topic, int qos, final T payload) {
+
+        validateInput(topic, payload);
+
         if (!client.isConnected()) {
             logger.warn("MQTT client not connected. Message not published.");
             return;
         }
 
-        validateInput(topic, payload);
-
         try {
-            final MqttMessage message = createMqttMessage(payload, topic);
+            final MqttMessage message = createMqttMessage(payload, qos, topic);
             doPublish(topic, message);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new MqttPublishException("Failed to serialize payload for topic [" + topic + "]", e);
-        } catch (MqttException e) {
+        } catch (final MqttException e) {
             throw new MqttPublishException("Failed to publish MQTT message", e);
         }
+
     }
-    protected <T> void validateInput(String topic, T payload) {
-        if (topic == null || topic.isBlank()) {
+
+    protected void validateInput(final String topic, final T payload) {
+        if (isNull(topic) || topic.isBlank()) {
             throw new InvalidMqttPublishRequestException("MQTT topic must not be null or blank");
         }
-        if (payload == null) {
+        if (isNull(payload)) {
             throw new InvalidMqttPublishRequestException("MQTT payload must not be null");
         }
     }
 
-
-    private <T> MqttMessage createMqttMessage(T payload, String topic) throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(payload);
+    private MqttMessage createMqttMessage(T payload, int qos, String topic) throws JsonProcessingException {
+        final String json = objectMapper.writeValueAsString(payload);
         logger.debug(() -> "Publishing to topic [" + topic + "]: " + json);
-        MqttMessage message = new MqttMessage(json.getBytes(UTF_8));
+        final MqttMessage message = new MqttMessage(json.getBytes(UTF_8));
         message.setQos(qos);
         return message;
     }

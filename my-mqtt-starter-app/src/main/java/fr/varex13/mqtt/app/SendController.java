@@ -1,6 +1,7 @@
 package fr.varex13.mqtt.app;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,9 +13,9 @@ import fr.varex13.mqtt.publisher.PublisherStrategy;
 @RestController
 public class SendController {
 
-    private final PublisherStrategy publisher;
+    private final PublisherStrategy<Notification> publisher;
 
-    public SendController(PublisherStrategy publisher) {
+    public SendController(PublisherStrategy<Notification> publisher) {
         this.publisher = publisher;
     }
 
@@ -30,7 +31,6 @@ public class SendController {
         publisher.publish("alerts/notificationsMethodLevel2_2", notif);
         publisher.publish("alerts/notificationsMethodLevel3_1", notif);
         publisher.publish("alerts/notificationsMethodLevel3_2", notif);
-        publisher.publish("capteurs/temperature", new Temperature(24, LocalDateTime.now()));
     }
 }
 

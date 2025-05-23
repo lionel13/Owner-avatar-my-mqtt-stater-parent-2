@@ -1,3 +1,6 @@
+server:
+  port: 8090
+
 mqtt:
   host: tcp://localhost:1883
   client-id: my-spring-client
